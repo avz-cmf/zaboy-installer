@@ -1,0 +1,35 @@
+{
+  "name": "avz-cmf/zaboy-installer",
+  "description": "Installer lib for create and automated install specific app/lib pref",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "avz-cmf",
+      "email": "email@example.com"
+    },
+    {
+      "name": "victorynox",
+      "email": "it.proffesor02@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^5.6 || ^7.0",
+    "zendframework/zend-servicemanager": "^3.0",
+    "composer/composer": "^1.0",
+    "composer-plugin-api": "^1.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "zaboy\\installer\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "zaboy\\test\\": "test/src"
+    }
+  }
+}
