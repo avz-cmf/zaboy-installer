@@ -31,9 +31,9 @@
 `script` файла `composer.json`
  ```json
    {
-     "lib-install": "zaboy\\InstallerCommands::install",
-     "lib-uninstall": "zaboy\\InstallerCommands::uninstall",
-     "lib-reinstall": "zaboy\\InstallerCommands::reinstall"
+     "lib-install": "zaboy\\InstallCommands::install",
+     "lib-uninstall": "zaboy\\InstallCommands::uninstall",
+     "lib-reinstall": "zaboy\\InstallCommands::reinstall"
    }
  ```
 > Без обромляющих символов `{` и `}`. И замените `zaboy` своим namespace
