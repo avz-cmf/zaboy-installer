@@ -91,7 +91,7 @@ abstract class AbstractCommand
                     //call command recursive by dep
                     if (AbstractCommand::$dep[$match[1]]['installed'] == 0) {
                         /** @var AbstractCommand $installer */
-                        (AbstractCommand::$dep[$match[1]]['class'])::{$commandType}($event);
+                        call_user_func([AbstractCommand::$dep[$match[1]]['class'], $commandType], $event);
                     }
                 }
                 //}
@@ -163,6 +163,7 @@ abstract class AbstractCommand
         try {
             static::command($event, self::INSTALL);
         } catch (\Exception $exception) {
+            $event->getIO()->writeError("Installing error: \n" .$exception->getMessage() . "\nUninstalling changes.");
             static::command($event, self::UNINSTALL);
         }
     }
@@ -187,6 +188,7 @@ abstract class AbstractCommand
         try {
             static::command($event, self::REINSTALL);
         } catch (\Exception $exception) {
+            $event->getIO()->writeError("Installing error: \n" .$exception->getMessage() . "\nUninstalling changes.");
             static::command($event, self::UNINSTALL);
         }
 
