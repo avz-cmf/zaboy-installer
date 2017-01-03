@@ -1,5 +1,9 @@
 # zaboy-installer
 
+---
+## [Оглавление](https://github.com/avz-cmf/Server-Drakon/blob/master/Table%20of%20contents.md)
+---
+
 Библиотека install позволяет произвести настройку окружение для вашей библиотеки или приложения.   
 
 Для того что бы настроить окружение вы должны создать класс `InstallCommands` который будет наследовать
