@@ -36,26 +36,18 @@ abstract class AbstractCommand
     private static $container = null;
 
     /**
-     * @return ContainerInterface
+     * @param Event $event
+     * @return void
      */
-    private static function getContainer()
+    public static function install(Event $event)
     {
-        if (!isset(AbstractCommand::$container))
-            AbstractCommand::$container = include 'config/container.php';
-
-        return AbstractCommand::$container;
+        try {
+            static::command($event, self::INSTALL);
+        } catch (\Exception $exception) {
+            $event->getIO()->writeError("Installing error: \n" . $exception->getMessage() . "\nUninstalling changes.");
+            static::command($event, self::UNINSTALL);
+        }
     }
-
-
-    /**
-     * Return
-     * @return string
-     */
-    public static function isLib()
-    {
-        return preg_match('/\/vendor\//', __DIR__) == 1;
-    }
-
 
     /**
      * do command for include installers.
@@ -107,6 +99,15 @@ abstract class AbstractCommand
     }
 
     /**
+     * Return
+     * @return string
+     */
+    public static function isLib()
+    {
+        return preg_match('/\/vendor\//', __DIR__) == 1;
+    }
+
+    /**
      * return array with Install class for lib;
      * dir - for search Installer automate
      * @param string $dir
@@ -126,18 +127,16 @@ abstract class AbstractCommand
         $className = basename($classPath);
         $srcRoot = substr($classPath, 0, strlen($classPath) - strlen($className) - 1);
 
-        $iterrator = new RecursiveDirectoryIterator($dir,
-            FilesystemIterator::KEY_AS_PATHNAME |
-            FilesystemIterator::SKIP_DOTS);
+        $iterator = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS |
+            FilesystemIterator::KEY_AS_PATHNAME);
 
-        foreach ($iterrator as $item) {
+        foreach ($iterator as $item) {
             //Save only class who implement InstallerInterface and has Installer in name
             /** @var $item RecursiveDirectoryIterator */
             if (!preg_match('/^(\.)|(vendor)/', $item->getFilename())) {
                 if ($item->isDir()) {
                     $installer = array_merge($installer, static::getInstallers($item->getPathname()));
-                } else if (preg_match('/Installer/', $item->getFilename())) {
-
+                } elseif (preg_match('/Installer/', $item->getFilename())) {
                     $path = substr($item->getPath(), strlen($srcRoot));
                     $namespace_ = $namespace . str_replace(DIRECTORY_SEPARATOR, '\\', $path);
                     $class = $namespace_ . '\\' . $item->getBasename('.php');
@@ -154,26 +153,22 @@ abstract class AbstractCommand
     }
 
     /**
-     * @param Event $event
-     * @return void
+     * @return ContainerInterface
      */
-    public
-    static function install(Event $event)
+    private static function getContainer()
     {
-        try {
-            static::command($event, self::INSTALL);
-        } catch (\Exception $exception) {
-            $event->getIO()->writeError("Installing error: \n" .$exception->getMessage() . "\nUninstalling changes.");
-            static::command($event, self::UNINSTALL);
+        if (!isset(AbstractCommand::$container)) {
+            AbstractCommand::$container = include 'config/container.php';
         }
+
+        return AbstractCommand::$container;
     }
 
     /**
      * @param Event $event
      * @return void
      */
-    public
-    static function uninstall(Event $event)
+    public static function uninstall(Event $event)
     {
         static::command($event, self::UNINSTALL);
     }
@@ -182,16 +177,33 @@ abstract class AbstractCommand
      * @param Event $event
      * @return void
      */
-    public
-    static function reinstall(Event $event)
+    public static function reinstall(Event $event)
     {
         try {
             static::command($event, self::REINSTALL);
         } catch (\Exception $exception) {
-            $event->getIO()->writeError("Installing error: \n" .$exception->getMessage() . "\nUninstalling changes.");
+            $event->getIO()->writeError("Installing error: \n" . $exception->getMessage() . "\nUninstalling changes.");
             static::command($event, self::UNINSTALL);
         }
 
     }
 
+    public static function getPublicDir()
+    {
+        /**
+         * Have a list of names of public directories.
+         * Iterate through the directory to check their availability and presence in her file index.php
+         */
+        $publicDirs = [
+            'www',
+            'public',
+            'web',
+        ];
+        foreach ($publicDirs as $publicDir) {
+            if (is_dir($publicDir) && file_exists($publicDir . DIRECTORY_SEPARATOR . "index.php")) {
+                return realpath($publicDir);
+            }
+        }
+        throw new \Exception("The public directory was not found");
+    }
 }

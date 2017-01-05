@@ -29,7 +29,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "zaboy\\test\\": "test/src"
+      "zaboy\\test\\installer\\": "tests/src"
     }
   }
 }
