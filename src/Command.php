@@ -61,8 +61,8 @@ class Command
     protected static function command(Event $event, $commandType)
     {
         //founds dep installer only if app
+        $composer = $event->getComposer();
         if (!static::isLib()) {
-            $composer = $event->getComposer();
             $localRep = $composer->getRepositoryManager()->getLocalRepository();
             //get all dep lis (include dependency of dependency)
             $dependencies = $localRep->getPackages();
@@ -72,11 +72,15 @@ class Command
                 $srcPath = $path = realpath('vendor') . DIRECTORY_SEPARATOR .
                     $target . DIRECTORY_SEPARATOR .
                     'src' . DIRECTORY_SEPARATOR;
-                $installers = static::getInstallers($srcPath);
+                $autoload = $dependency->getAutoload();
+                $namespace = array_keys($autoload['psr-4'])[0];
+                $installers = static::getInstallers($srcPath, $namespace);
                 static::callInstallers($installers, $commandType, $event->getIO());
             }
         }
-        $installers = static::getInstallers();
+        $autoload = $composer->getPackage()->getAutoload();
+        $namespace = array_keys($autoload['psr-4'])[0];
+        $installers = static::getInstallers($namespace);
         static::callInstallers($installers, $commandType, $event->getIO());
     }
 
@@ -104,20 +108,12 @@ class Command
      * @param string $dir
      * @return InstallerInterface[]
      */
-    public static function getInstallers($dir = null)
+    public static function getInstallers($namespace, $dir = null)
     {
-
         $installer = [];
         if (!isset($dir)) {
-            $dir = __DIR__;
+            $dir = realpath('src/');
         }
-        //create template path for search Installer class
-        $reflector = new \ReflectionClass(static::class);
-        $namespace = $reflector->getNamespaceName();
-        $classPath = $reflector->getFileName();
-        $className = basename($classPath);
-        $srcRoot = substr($classPath, 0, strlen($classPath) - strlen($className) - 1);
-
         $iterator = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS |
             FilesystemIterator::KEY_AS_PATHNAME);
 
@@ -126,9 +122,19 @@ class Command
             /** @var $item RecursiveDirectoryIterator */
             if (!preg_match('/^(\.)|(vendor)/', $item->getFilename())) {
                 if ($item->isDir()) {
-                    $installer = array_merge($installer, static::getInstallers($item->getPathname()));
+                    $installer = array_merge($installer, static::getInstallers($namespace, $item->getPathname()));
                 } elseif (preg_match('/Installer/', $item->getFilename())) {
-                    $path = substr($item->getPath(), strlen($srcRoot));
+
+                    //get path to lib
+                    $match = [];
+                    $path = preg_match('/\/vendor\/([\w-\/]+)/', $item->getPath(), $match)
+                    && isset($match[1]) ? $match[1] : $item->getPath();
+
+                    //get path to src
+                    $match = [];
+                    $path = preg_match('/\/src\/([\w-\/]+)/', $item->getPath(), $match)
+                    && isset($match[1]) ? $match[1] : $item->getPath();
+
                     $namespace_ = $namespace . str_replace(DIRECTORY_SEPARATOR, '\\', $path);
                     $class = $namespace_ . '\\' . $item->getBasename('.php');
                     $reflector = new \ReflectionClass($class);
