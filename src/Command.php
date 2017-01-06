@@ -7,14 +7,16 @@
  * Time: 4:02 PM
  */
 
-namespace zaboy\installer\Install;
+namespace zaboy\installer;
 
+use Composer\IO\IOInterface;
 use Composer\Script\Event;
 use FilesystemIterator;
 use Interop\Container\ContainerInterface;
 use RecursiveDirectoryIterator;
+use zaboy\installer\Install\InstallerInterface;
 
-abstract class AbstractCommand
+class Command
 {
 
     const INSTALL = 'install';
@@ -66,35 +68,24 @@ abstract class AbstractCommand
             $dependencies = $localRep->getPackages();
             foreach ($dependencies as $dependency) {
                 $target = $dependency->getPrettyName();
-                $match = [];
-                //get dependencies who has InstallCommands
-                $path = realpath('vendor') . DIRECTORY_SEPARATOR .
+                //get dependencies and get installer
+                $srcPath = $path = realpath('vendor') . DIRECTORY_SEPARATOR .
                     $target . DIRECTORY_SEPARATOR .
-                    'src' . DIRECTORY_SEPARATOR .
-                    'InstallCommands.php';
-                if (preg_match('/^[\w\-\_]\/([\w\-\_]+)$/', $target, $match) && file_exists($path)) {
-                    if (!isset(AbstractCommand::$dep[$match[1]])) {
-                        $class = $match[1] . '\\InstallCommands';
-                        AbstractCommand::$dep[$match[1]] = [
-                            "class" => $class
-                        ];
-                        AbstractCommand::$dep[$match[1]]['installed'] = class_exists($class) ? 0 : -1;
-                    }
-                    //call command recursive by dep
-                    if (AbstractCommand::$dep[$match[1]]['installed'] == 0) {
-                        /** @var AbstractCommand $installer */
-                        call_user_func([AbstractCommand::$dep[$match[1]]['class'], $commandType], $event);
-                    }
-                }
-                //}
+                    'src' . DIRECTORY_SEPARATOR;
+                $installers = static::getInstallers($srcPath);
+                static::callInstallers($installers, $commandType, $event->getIO());
             }
         }
-
         $installers = static::getInstallers();
+        static::callInstallers($installers, $commandType, $event->getIO());
+    }
+
+    protected static function callInstallers(array $installers, $commandType, IOInterface $io)
+    {
         /** @var InstallerInterface $installer */
         foreach ($installers as $installerClass) {
-            $installer = new $installerClass(self::getContainer());
-            $installer->{$commandType}();
+            $installer = new $installerClass(self::getContainer(), $io);
+            call_user_func([$installer, $commandType]);
         }
     }
 
@@ -157,11 +148,11 @@ abstract class AbstractCommand
      */
     private static function getContainer()
     {
-        if (!isset(AbstractCommand::$container)) {
-            AbstractCommand::$container = include 'config/container.php';
+        if (!isset(Command::$container)) {
+            Command::$container = include 'config/container.php';
         }
 
-        return AbstractCommand::$container;
+        return Command::$container;
     }
 
     /**

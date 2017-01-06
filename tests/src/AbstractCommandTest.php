@@ -8,7 +8,7 @@
 
 namespace zaboy\test\installer;
 
-use zaboy\installer\Install\AbstractCommand;
+use zaboy\installer\Command;
 
 class AbstractCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +16,7 @@ class AbstractCommandTest extends \PHPUnit_Framework_TestCase
     public function test__publicDir()
     {
         $expectedPublicDir = realpath('public');
-        $publicDir = AbstractCommand::getPublicDir();
+        $publicDir = Command::getPublicDir();
         $this->assertEquals($expectedPublicDir, $publicDir);
     }
 }

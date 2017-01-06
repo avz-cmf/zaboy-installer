@@ -9,6 +9,7 @@
 namespace zaboy\installer\Install;
 
 
+use Composer\IO\IOInterface;
 use Interop\Container\ContainerInterface;
 
 interface InstallerInterface
@@ -16,8 +17,9 @@ interface InstallerInterface
     /**
      * Installer constructor.
      * @param ContainerInterface $container
+     * @param IOInterface $IO
      */
-    public function __construct(ContainerInterface $container);
+    public function __construct(ContainerInterface $container, IOInterface $IO);
 
     //TODO: init and re must make clean if during installation exception was obtained.
     /**

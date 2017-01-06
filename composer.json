@@ -31,5 +31,10 @@
     "psr-4": {
       "zaboy\\test\\installer\\": "tests/src"
     }
+  },
+  "scripts": {
+    "lib-install": "zaboy\\installer\\Commands::install",
+    "lib-uninstall": "zaboy\\installer\\Commands::uninstall",
+    "lib-reinstall": "zaboy\\installer\\Commands::reinstall"
   }
 }
