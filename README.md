@@ -37,12 +37,14 @@
 ## Запуск установщиков
   
 Для того что бы можно было запускать инсталлеры используя композер вы должны добавить следующий учаток кода в секцию 
-`script` файла `composer.json`
+`scripts` файла `composer.json`
  ```json
    {
-     "lib-install": "zaboy\\InstallCommands::install",
-     "lib-uninstall": "zaboy\\InstallCommands::uninstall",
-     "lib-reinstall": "zaboy\\InstallCommands::reinstall"
+      "scripts": {
+        "lib-install": "zaboy\\InstallCommands::install",
+        "lib-uninstall": "zaboy\\InstallCommands::uninstall",
+        "lib-reinstall": "zaboy\\InstallCommands::reinstall"
+      }
    }
  ```
 > Без обромляющих символов `{` и `}`. И замените `zaboy` своим namespace
