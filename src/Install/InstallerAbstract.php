@@ -24,12 +24,12 @@ abstract class InstallerAbstract implements InstallerInterface
     /**
      * Installer constructor.
      * @param ContainerInterface $container
-     * @param IOInterface $io
+     * @param IOInterface $ioComposer
      * @internal param IOInterface $IO
      */
-    public function __construct(ContainerInterface $container, IOInterface $io)
+    public function __construct(ContainerInterface $container, IOInterface $ioComposer)
     {
-        $this->io = $io;
+        $this->io = $ioComposer;
         $this->container = $container;
     }
 

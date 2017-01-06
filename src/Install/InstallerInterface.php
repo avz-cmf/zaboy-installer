@@ -17,9 +17,10 @@ interface InstallerInterface
     /**
      * Installer constructor.
      * @param ContainerInterface $container
-     * @param IOInterface $IO
+     * @param IOInterface $ioComposer
+     * @internal param IOInterface $IO
      */
-    public function __construct(ContainerInterface $container, IOInterface $IO);
+    public function __construct(ContainerInterface $container, IOInterface $ioComposer);
 
     //TODO: init and re must make clean if during installation exception was obtained.
     /**
