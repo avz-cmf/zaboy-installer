@@ -44,11 +44,32 @@
         }
    }
  ```
-> Без обромляющих символов `{` и `}`. И замените `zaboy` своим namespace
-
 Теперь после того как все предыдущее шаги были сделаны, вы можете используя команды 
 * `composer lib-install` - Запускать инсталяторы для настрройки окружения. 
 * `composer lib-uninstall` - Удалять настроки окружения.
 * `composer lib-reinstall` - Переустанавливать окружения.  
 
+## Composer\IO\IOInterface
 
+[Official DOC](https://getcomposer.org/apidoc/master/Composer/IO/IOInterface.html)
+
+Краткий туториал
+
+Что бы вывести сообщение используйте ф-цию `write`
+
+```php
+$io->write("some text");
+```
+
+Что бы вывести сообщение об ошибке используйте ф-цию `write`
+
+```php
+$io->writeError(("some text");
+```
+
+Что бы задать пользователю вопрос используйте ф-цию `write`
+
+```php
+$answer = $io->ask("question");
+```
+Для более детального изучения читайте [документацию](https://getcomposer.org/apidoc/master/Composer/IO/IOInterface.html).
