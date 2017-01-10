@@ -135,10 +135,10 @@ class Command
                     //get path to src
                     $match = [];
                     $path = preg_match('/\/src\/([\w-\/]+)/', $item->getPath(), $match)
-                    && isset($match[1]) ? $match[1] : $item->getPath();
+                    && isset($match[1]) ? $match[1] : $path;
 
                     $namespace_ = $namespace . str_replace(DIRECTORY_SEPARATOR, '\\', $path);
-                    $class = $namespace_ . '\\' . $item->getBasename('.php');
+                    $class = rtrim($namespace_, '\\') . '\\' . $item->getBasename('.php');
                     $reflector = new \ReflectionClass($class);
                     if ($reflector->implementsInterface(InstallerInterface::class) &&
                         !$reflector->isAbstract() && !$reflector->isInterface()
