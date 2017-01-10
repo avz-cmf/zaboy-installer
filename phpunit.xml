@@ -1,6 +1,6 @@
-<phpunit bootstrap="vendor/autoload.php" colors="true">
+<phpunit bootstrap="tests/bootstrap.php" colors="true">
     <testsuites>
-        <testsuite name="zaboy\\test\\rest\\">
+        <testsuite name="zaboy\\test\\installer\\">
             <directory>./tests/src/</directory>
         </testsuite>
     </testsuites>
