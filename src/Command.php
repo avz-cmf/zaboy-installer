@@ -16,6 +16,8 @@ use Interop\Container\ContainerInterface;
 use RecursiveDirectoryIterator;
 use zaboy\installer\Install\InstallerInterface;
 
+require_once 'config/env_configurator.php';
+
 class Command
 {
 
